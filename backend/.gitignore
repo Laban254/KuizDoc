@@ -3,9 +3,11 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+*.sqlite3
 
 # Database
 
 
 # Virtual environment
 myvenv/
+kenv/
