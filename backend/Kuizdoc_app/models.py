@@ -8,6 +8,8 @@ class Documents(models.Model):
     DateCreated = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        managed = True
+        db_table = 'Documents'
         verbose_name_plural = "Documents"
 
 class QuizQuestions(models.Model):
@@ -22,6 +24,8 @@ class QuizQuestions(models.Model):
     DateCreated = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        managed = True
+        db_table = 'QuizQuestions'
         verbose_name_plural = "QuizQuestions"   
 
 class UserAnswers(models.Model):
@@ -32,6 +36,8 @@ class UserAnswers(models.Model):
     DateCreated = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        managed = True
+        db_table = 'UserAnswers'
         verbose_name_plural = "UserAnswers"
 
 class UserScores(models.Model):
@@ -42,5 +48,7 @@ class UserScores(models.Model):
     DateCreated = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        managed = True
+        db_table = 'UserScores'
         verbose_name_plural = "UserScores"
 
