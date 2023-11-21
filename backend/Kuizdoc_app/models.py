@@ -3,10 +3,10 @@ from django.contrib.auth.models import User as UserAuth
 
 class Documents(models.Model):
     Documentid = models.AutoField(primary_key=True)
-    User = models.ForeignKey(UserAuth, on_delete=models.CASCADE)
+    #User = models.ForeignKey(UserAuth, on_delete=models.CASCADE)
     DateCreated = models.DateTimeField(auto_now_add=True)
     file = models.FileField(upload_to='documents/')
-    url = models.CharField(max_length=200)
+    #url = models.CharField(max_length=200)
     
 
     class Meta:
