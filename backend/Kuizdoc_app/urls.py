@@ -1,6 +1,5 @@
 from django.urls import path, include
-from . import views
-from .views import uploadDoc
+from .views import uploadDoc, summalizedoc
 
 from rest_framework.routers import DefaultRouter
 
@@ -10,5 +9,5 @@ router.register('docupload', uploadDoc, basename='docupload')
 urlpatterns = [
     
     path('upload/', include(router.urls) ),
-    path('summarize/<int:id>/', views.summalizedoc.as_view(), name='summarize'),
+    path('summarize/<int:id>/', summalizedoc.as_view(), name='summarize'),
 ]
