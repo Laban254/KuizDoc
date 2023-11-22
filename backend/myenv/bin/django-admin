@@ -1,4 +1,4 @@
-#!/home/kibe/Desktop/myprojects/hachathon/KuizDoc/backend/myenv/bin/python3
+#!/home/thuku/PROJOS/KuizDoc/backend/myenv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys
