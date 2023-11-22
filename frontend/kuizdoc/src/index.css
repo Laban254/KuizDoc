@@ -1,0 +1,257 @@
+html, body{
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+body {
+  background-color: #77CAFF;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.Btn {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 45px;
+  height: 45px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition-duration: .3s;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.199);
+  background-color: #011F43;
+  margin-right: 10px;
+  float: right; 
+}
+
+/* plus sign */
+.sign {
+  width: 100%;
+  transition-duration: .3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sign svg {
+  width: 17px;
+}
+
+.sign svg path {
+  fill: white;
+}
+/* text */
+.text {
+  position: absolute;
+  right: 0%;
+  width: 0%;
+  opacity: 0;
+  color: white;
+  font-size: 1.2em;
+  font-weight: 600;
+  transition-duration: .3s;
+}
+/* hover effect on button width */
+.Btn:hover {
+  width: 125px;
+  border-radius: 40px;
+  transition-duration: .3s;
+}
+
+.Btn:hover .sign {
+  width: 30%;
+  transition-duration: .3s;
+  padding-left: 20px;
+}
+/* hover effect button's text */
+.Btn:hover .text {
+  opacity: 1;
+  width: 70%;
+  transition-duration: .3s;
+  padding-right: 10px;
+}
+/* button click effect*/
+.Btn:active {
+  transform: translate(2px ,2px);
+}
+
+.container {
+  position: relative;
+  font-family: sans-serif;
+  top: 0px;
+}
+
+.container::before, .container::after {
+  content: "";
+  background-color: #fab5704c;
+  position: absolute;
+}
+
+.container::before {
+  /* border-radius: 50%;
+  width: 12rem; 
+  height: 12rem; 
+  top: 30%;
+  left: 7%;  */
+}
+
+.container .box {
+  width: 23.75em; /* 100% bigger */
+  height: 38.75em; /* 100% bigger */
+  padding: 0.2rem; /* 100% bigger */
+  background-color: rgba(255, 255, 255, 0.074);
+  /* border: 1px solid rgba(255, 255, 255, 0.222); */
+  -webkit-backdrop-filter: blur(50px); /* 100% bigger */
+  backdrop-filter: blur(50px); /* 100% bigger */
+  border-radius: 1rem; /* 100% bigger */
+  transition: all ease .3s;
+}
+
+.container .box {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.container .box .title {
+  font-size: 4rem; /* 100% bigger */
+  font-weight: 500;
+  letter-spacing: .1em;
+}
+
+.container .box div strong {
+  display: block;
+  margin-bottom: 2.5rem; /* 100% bigger */
+}
+
+.container .box div p {
+  margin: 0;
+  font-size: 2.4em; /* 100% bigger */
+  font-weight: 300;
+  letter-spacing: .1em;
+}
+
+.container .box div span {
+  font-size: 1.6rem; /* 100% bigger */
+  font-weight: 300;
+}
+
+.container .box div span:nth-child(3) {
+  font-weight: 500;
+  margin-right: .7rem; /* 100% bigger */
+}
+
+.container .box:hover {
+  /* box-shadow: 0px 0px 25px 1px #ffbb763f; 100% bigger */
+  /* border: 1px solid rgba(255, 255, 255, 0.454); */
+}
+
+.glass-effect {
+  background-color: rgba(255, 255, 255, 0.074);
+  -webkit-backdrop-filter: blur(50px);
+  backdrop-filter: blur(50px);
+  border-radius: 10%;
+}
+
+.cssbuttons-io-button {
+  display: flex;
+  align-items: center;
+  font-family: inherit;
+  font-weight: 500;
+  font-size: 17px;
+  padding: 0.8em 1.5em 0.8em 1.2em;
+  color: white;
+  /* background: #ad5389;
+  background: linear-gradient(0deg, rgb(120, 47, 255) 0%, rgb(185, 132, 255) 100%); */
+  border: none;
+  /* box-shadow: 0 0.7em 1.5em -0.5em rgb(184, 146, 255); */
+  letter-spacing: 0.05em;
+  border-radius: 20em;
+}
+
+.cssbuttons-io-button svg {
+  margin-right: 8px;
+}
+
+.cssbuttons-io-button:hover {
+  /* box-shadow: 0 0.5em 1.5em -0.5em rgb(149, 91, 255); */
+}
+
+.cssbuttons-io-button:active {
+  box-shadow: 0 0.3em 1em -0.5em rgb(160, 109, 255);
+}
+
+.button {
+  font-family: inherit;
+  font-size: 14px;
+  background: royalblue;
+  color: white;
+  padding: 0.7em 1em;
+  padding-left: 0.9em;
+  display: flex;
+  align-items: center;
+  border: none;
+  border-radius: 0, 16px, 0, 16px;
+  overflow: hidden;
+  transition: all 0.2s;
+  cursor: pointer;
+  height: 3.3em;
+  margin-top: 2em;
+}
+
+.button span {
+  display: block;
+  margin-left: 0.3em;
+  transition: all 0.3s ease-in-out;
+}
+
+.button svg {
+  display: block;
+  transform-origin: center center;
+  transition: transform 0.3s ease-in-out;
+}
+
+.button:hover .svg-wrapper {
+  animation: fly-1 0.6s ease-in-out infinite alternate;
+}
+
+.button:hover svg {
+  transform: translateX(1.2em) rotate(45deg) scale(1.1);
+}
+
+.button:hover span {
+  transform: translateX(5em);
+}
+
+.button:active {
+  transform: scale(0.95);
+}
+
+@keyframes fly-1 {
+  from {
+    transform: translateY(0.1em);
+  }
+
+  to {
+    transform: translateY(-0.1em);
+  }
+}
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
