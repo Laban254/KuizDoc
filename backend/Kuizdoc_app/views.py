@@ -8,124 +8,189 @@ from rest_framework.views import APIView
 import openai
 from openai import OpenAI
 import os
-from rest_framework.parsers import FileUploadParser
-from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
-import PyPDF2
-
+import fitz
+import nltk
+nltk.download('punkt')
+from nltk.tokenize import sent_tokenize
+from io import StringIO
 
 class uploadDoc(viewsets.ModelViewSet):
-    queryset = Documents.objects.all()
-    serializer_class = DocumentsSerializer
-    parser_classes = (MultiPartParser, FormParser,)
+   """
+   A viewset for uploading documents.
 
-    def post(self, request, *args, **kwargs):
-        file_serializer = DocumentsSerializer(data=request.data)
-        if file_serializer.is_valid():
-            file_serializer.save()
-            return Response(file_serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-# class summalizedoc will handle the get summalize request, the user will send the document id and the function will return the summalized content, 
-# the function will use the openai api to summalize the document
-# the function will return the summalized content
-# the function will take the document id as a parameter
+   Attributes:
+       queryset (QuerySet): All documents in the database.
+       serializer_class (DocumentsSerializer): The serializer for the documents.
+       parser_classes (Tuple): The parsers for the viewset.
+   """
+   queryset = Documents.objects.all()
+   serializer_class = DocumentsSerializer
+   parser_classes = (MultiPartParser, FormParser,)
+
+   def post(self, request, *args, **kwargs):
+       """
+       Handles POST requests for uploading documents.
+
+       Args:
+           request (HttpRequest): The HTTP request.
+           *args: Variable length argument list.
+           **kwargs: Arbitrary keyword arguments.
+
+       Returns:
+           HttpResponse: The HTTP response.
+       """
+       file_serializer = DocumentsSerializer(data=request.data)
+       if file_serializer.is_valid():
+           file_serializer.save()
+           return Response(file_serializer.data, status=status.HTTP_201_CREATED)
+       else:
+           return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class summalizedoc(APIView):
-    def get(self, request, id, format=None):
-        """
-        get the document id
-        read the document content
-        split the document content into chunks of 2048 characters
-        send each chunk to the openai api to summalize it
-        return the summalized content
+   """
+   A view for summarizing documents.
 
-        args:
-            id: document id
+   Attributes:
+       None
+   """
+   def get(self, request, id, format=None):
+       """
+       Handles GET requests for summarizing documents.
 
-        return:
-            summalized content
-        """
-        #openai.api_key = os.environ.get('OPENAI_API_KEY')
-       
-        client = OpenAI(api_key="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")
+       Args:
+           request (HttpRequest): The HTTP request.
+           id (int): The ID of the document to summarize.
+           format (str): The format of the response.
 
+       Returns:
+           HttpResponse: The HTTP response.
+       """
+       try:
+           document = Documents.objects.get(Documentid=id)
+           document_content = self.read_pdf(document.file)
+           cleaned_text = self.clean_text(document_content)
+       except Documents.DoesNotExist:
+           return Response({"error": "No document found"}, status=404)
 
-        # try:
-        #     document = Documents.objects.get(Documentid=id)
+       summaries = self.summarize_text(cleaned_text)
+       return Response({"summaries": summaries})
 
-        #     document_content = self.read_pdf(document.file)
-        # except Documents.DoesNotExist:
-        #     return Response({"error": "No document found"}, status=404)
+   def clean_text(self, text):
+       """
+       Cleans the text by replacing special characters with spaces.
 
-        # summaries = []
+       Args:
+           text (str): The text to clean.
 
-        # for chunk in self.split_text(document_content):
-        #     response = openai.Completion.create(
-        #         engine="text-davinci-002",
-        #         prompt=f"{chunk}\n\nSummarize:",
-        #         max_tokens=150
-        #     )
-        #     summaries.append(response.choices[0].text.strip())
+       Returns:
+           str: The cleaned text.
+       """
+       cleaned_text = text.replace('\n', ' ')
+       cleaned_text = cleaned_text.replace('\t', ' ')
+       cleaned_text = cleaned_text.replace('\r', ' ')
+       cleaned_text = cleaned_text.replace('\x0c', ' ')
+       cleaned_text = cleaned_text.replace('\x0b', ' ')
+       cleaned_text = cleaned_text.replace('\x0e', ' ')
+       cleaned_text = cleaned_text.replace('\x0f', ' ')
+       cleaned_text = cleaned_text.replace('\x10', ' ')
+       cleaned_text = cleaned_text.replace('\x11', ' ')
+       cleaned_text = cleaned_text.replace('\x12', ' ')
+       cleaned_text = cleaned_text.replace('\x13', ' ')
+       cleaned_text = cleaned_text.replace('\x14', ' ')
+       cleaned_text = cleaned_text.replace('\x15', ' ')
+       cleaned_text = cleaned_text.replace('\x16', ' ')
+       cleaned_text = cleaned_text.replace('\x17', ' ')
+       cleaned_text = cleaned_text.replace('\x18', ' ')
+       return cleaned_text
 
-        # return Response({"summaries": summaries})
+   def summarize_text(self, text, chunk_size=5000):
+       """
+       Summarizes the text using the OpenAI GPT-3.5-turbo-1106 model.
 
-        try:
-            document = Documents.objects.get(Documentid=id)
-            document_content = self.read_pdf(document.file)
-        except Documents.DoesNotExist:
-            return Response({"error": "No document found"}, status=404)
+       Args:
+           text (str): The text to summarize.
+           chunk_size (int): The size of the chunks to split the text into.
 
-        summaries = []
+       Returns:
+           list: The summaries of the text.
+       """
+       summaries = []
+       openai_client = OpenAI(api_key="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")
 
-        for chunk in self.split_text(document_content):
-            client = OpenAI(api_key="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")
-            GPT_MODEL = "gpt-3.5-turbo-1106"
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": f"{chunk}\n\nSummarize:"},
-            ],
-            response = client.chat.completions.create(
-                model=GPT_MODEL,
-                messages=messages,
-                temperature=0,
-                max_tokens=150,
-                stop=["\n\n"]
-            )
-            response_message = response.choices[0].message.content
-            summaries.append(response['choices'][0]['message']['content'].strip())
-            print(summaries)
-            #summaries.append(response_message.strip())
+       for chunk in self.split_text(text, chunk_size):
+           GPT_MODEL = "gpt-3.5-turbo-1106"
+           messages = [
+               {"role": "system", "content": "You are a helpful assistant."},
+               {"role": "user", "content": f"{chunk}\n\nSummarize:"},
+           ]
 
-        return Response({"summaries": summaries})
+           response = openai_client.chat.completions.create(
+               model=GPT_MODEL,
+               messages=messages,
+               temperature=0,
+               max_tokens=150,
+               stop=["\n\n"]
+           )
 
+           summaries.append(response.choices[0].message.content.strip())
+       print(f"The summaries are {summaries}")
+       return summaries
+   def split_text(self, text, chunk_size=5000):
+    print(f"Splinting text into chunks of {chunk_size} characters")
+    """
+        Splits the text into chunks of a specified size.
 
-    def split_text(self, text):
-        """
-        Split the text into chunks of 2048 characters.
-        """
-        max_chunk_size = 2048
-        chunks = []
-        current_chunk = ""
+        Args:
+            text (str): The text to split.
+            chunk_size (int): The size of the chunks.
 
-        for sentence in text.split("."):
-            if len(current_chunk) + len(sentence) < max_chunk_size:
-                current_chunk += sentence + "."
-            else:
-                chunks.append(current_chunk.strip())
-                current_chunk = sentence + "."
+        Returns:
+            list: The chunks of text.
+    """
+    chunks = []
+    current_chunk = StringIO()
+    current_size = 0
+    sentences = sent_tokenize(text)
+    for sentence in sentences:
 
-        if current_chunk:
-            chunks.append(current_chunk.strip())
+        sentence_size = len(sentence)
+        if sentence_size > chunk_size:
+            while sentence_size > chunk_size:
+                chunk = sentence[:chunk_size]
+                chunks.append(chunk)
+                print(f"The chunk is {chunk}")
+                sentence = sentence[chunk_size:]
+                sentence_size -= chunk_size
+                current_chunk = StringIO()
+                current_size = 0
+        if current_size + sentence_size < chunk_size:
+            current_chunk.write(sentence)
+            current_size += sentence_size
+        else:
+            chunks.append(current_chunk.getvalue())
+            current_chunk = StringIO()
+            current_chunk.write(sentence)
+            current_size = sentence_size
+    if current_chunk:
+        chunks.append(current_chunk.getvalue())
+    return chunks
+   def read_pdf(self, file_path):
+      
+      """
+      Reads the content of a PDF file.
 
-        return chunks
-    
-    def read_pdf(self, file_path):
-        pdf_file_obj = open(file_path.path, 'rb')
-        pdf_reader = PyPDF2.PdfReader(pdf_file_obj)
-        text = ""
-        for page_obj in pdf_reader.pages:
-            text += page_obj.extract_text()
+      Args:
+          file_path (str): The path of the PDF file.
 
-        pdf_file_obj.close()
-        return text
+      Returns:
+          str: The content of the PDF file.
+      """
+      context = ""
+      with fitz.open(file_path.path) as pdf_file:
+          num_pages = pdf_file.page_count
+          for page_num in range(num_pages):
+              page = pdf_file[page_num]
+              page_text = page.get_text()
+              context += page_text
+      print(f"The pdf Context is {context}")
+      return context
