@@ -8,20 +8,20 @@ function InputField({ label, id, type, onChange, value, options, isSignup, input
   
     return (
       <div className="block relative">
-        <label htmlFor={id} className="mt-4 block text-white cursor-text text-sm leading-[140%] font-normal mb-2">
+        <label htmlFor={id} className="mt-4 block text-white cursor-text text-md leading-[140%] font-normal mb-2">
           {label}
         </label>
         <input
           type={type}
           id={id}
-          className="rounded border border-gray-200 text-sm w-full font-normal leading-[18px] text-black tracking-[0px] appearance-none block h-11 m-0 p-[11px] focus:ring-2 ring-offset-2 ring-gray-900 outline-0"
+          className="rounded border mx-auto border-gray-200 text-md w-full font-normal leading-[18px] text-black tracking-[0px] appearance-none block h-11 m-0 p-[11px] focus:ring-2 ring-offset-2 ring-gray-900 outline-0"
           onChange={onChange}
           value={value}
           list={options}
           pattern={pattern}
           
         />
-        {isSignup && !inputType && <div className="text-sm text-red-500 text-center">{`Please fill in your ${label}`}</div>}
+        {isSignup && !inputType && <div className="text-md text-red-500 text-center">{`Please fill in your ${label}`}</div>}
       </div>
     );
   }
@@ -29,10 +29,10 @@ function InputField({ label, id, type, onChange, value, options, isSignup, input
 function FormSection({ title, subtitle, children, onSubmit }) {
     
     return (
-      <div className="max-w-lg relative flex flex-col p-4 rounded-md bg-[#011329] text-white" >
-        <div className="text-2xl font-bold mb-2 text-white text-center">{title}</div>
-        <div className="text-sm font-normal mb-4 text-center text-white">{subtitle}</div>
-        <form className="flex flex-col gap-3 flex-grow" onSubmit={onSubmit}>
+      <div className="max-w-[50rem] relative flex flex-col p-4 rounded-md bg-[#011329] text-white" >
+        <div className="text-3xl font-bold mb-2 font-bold text-white text-center">{title}</div>
+        <div className="text-md font-normal mb-4 text-center text-white">{subtitle}</div>
+        <form className="flex text-md flex-col gap-6 flex-grow" onSubmit={onSubmit}>
           {children}
         </form>
       </div>
@@ -127,10 +127,10 @@ function Auth() {
         <>
         {/** relative flex flex-col p-2 rounded-md bg-[#011F43]*/}
             <div className="flex flex-col items-center justify-center h-screen ">
-                <div className="p-10 mx-auto rounded-md bg-[#011F43]">
+                <div className="p-10 mx-auto rounded-xl bg-[#011F43]">
                     <FormSection
                     title={isSignup? "Create your account" : "Welcome back to Kuizdoc"}
-                    subtitle={isSignup? "Signup to create your account" : "Log in to your account"}
+                    subtitle={isSignup? "Sign up to create your account" : "Log in to your account"}
                     onSubmit={isSignup ? handleSignUpSubmit : handleLoginSubmit}
                     >
                       {isSignup ? (
@@ -220,12 +220,12 @@ function Auth() {
                           isSignup={isSignup} 
                           />
                           <div className=" w-full sm:w-1/2 mb-4 ml-0">
-                            <label htmlFor="gender" className="mt-4 block text-white cursor-text text-sm leading-[140%] font-normal mb-2">
+                            <label htmlFor="gender" className="mt-4 block text-white cursor-text text-md leading-[140%] font-normal mb-2">
                               Gender
                               </label>
                               <select
                               id="gender"
-                              className="rounded border border-gray-200 text-sm w-full  font-normal leading-[18px] text-black tracking-[0px] appearance-none block h-11 m-0 p-[11px] focus:ring-2 ring-offset-2 ring-gray-900 outline-0"
+                              className="rounded border border-gray-200 text-md w-full  font-normal leading-[18px] text-black tracking-[0px]  block h-11 m-0 p-[0px] focus:ring-2 ring-offset-2 ring-[#011F43] outline-0 "
                               onChange={(event) => setGender(event.target.value)}
                               value={gender}
                               required
@@ -270,7 +270,7 @@ function Auth() {
 
                         
                         <div>
-                            <a className="text-sm text-[#77CAFF]" href="#">
+                            <a className="text-md text-[#77CAFF]" href="#">
                             {isSignup? "": "Forgot your password?"}
                             </a>
                         </div>
@@ -278,7 +278,7 @@ function Auth() {
                             {isSignup ? "Sign up" : "Log in"}
                         </button>
                     </FormSection>
-                    <button onClick={() => setIsSignup(!isSignup)} className="text-sm text-[#77CAFF]">
+                    <button onClick={() => setIsSignup(!isSignup)} className="text-md text-[#77CAFF]">
                     {isSignup ? "Already have an account? Log in" : "Don’t have an account yet? Sign up for free!"}
                     </button>
                 </div>

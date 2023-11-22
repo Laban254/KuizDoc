@@ -198,18 +198,17 @@ code {
 .button {
   font-family: inherit;
   font-size: 14px;
-  background: royalblue;
+  background: #011F43;
   color: white;
   padding: 0.7em 1em;
   padding-left: 0.9em;
   display: flex;
   align-items: center;
   border: none;
-  border-radius: 0, 16px, 0, 16px;
   overflow: hidden;
   transition: all 0.2s;
   cursor: pointer;
-  height: 3.3em;
+  height: 2.7em;
   margin-top: 2em;
 }
 
@@ -240,6 +239,10 @@ code {
 .button:active {
   transform: scale(0.95);
 }
+
+
+
+
 
 @keyframes fly-1 {
   from {
