@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import SideBar from "../SideBar/SideBar";
 import {useNavigate} from 'react-router-dom';
 
@@ -7,10 +7,13 @@ function Home() {
     const [chatHistory, setChatHistory] = useState([]);
     const [isNewChat, setisNewChat] = useState(false)
     const navigate = useNavigate();
+    const [data, setData] = useState(null);
+    const [documentId, setDocumentId] = useState(null);
 
     // const toggleDrawer = () => {
     //     setOpen(!open);
     // };
+
 
     const sendMessage = (event) => {
         if (event.key === 'Enter') {
@@ -32,15 +35,74 @@ function Home() {
         setisNewChat(false);
       
         if (selectedFile) {
-          // Do something with the selected file, e.g., upload it to a server
-          console.log(`Selected file: ${selectedFile.name}`);
+            // Do something with the selected file, e.g., upload it to a server
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            fetch('http://127.0.0.1:8000/upload/docupload/', {
+            method: 'POST',
+            body: formData,
+            })
+            .then(response => {
+                if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Handle the response from the server
+                 setDocumentId(data.Documentid);
+                console.log('File uploaded successfully:', documentId);
+                console.log('File uploaded successfully:', data);
+                // You may want to perform additional actions with the response data
+
+            })
+            .catch(error => {
+                // Handle errors more gracefully, e.g., display an error message
+                console.error('Error uploading file:', error.message);
+            });
         }
+            
+
+          console.log(`Selected file: ${selectedFile.name}`);
+        
       }
 
       const handleLogout = () => { 
         localStorage.removeItem('token');
         navigate('/');
       }
+
+      useEffect(() => {
+        // Define an asynchronous function to fetch data
+        const fetchData = async () => {
+          try {
+            // Make the asynchronous fetch request
+            const response = await fetch(`http://127.0.0.1:8000/summarize/${documentId}/`);
+            
+            // Check if the request was successful
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+    
+            // Parse the response JSON
+            const result = await response.json();
+
+    
+            // Update the component state with the fetched data
+            setData(result);
+            console.log("Successuflly fetched data", result)
+          } catch (error) {
+            console.error('Error fetching data:', error);
+          }
+        };
+    
+        // Call the async function
+        fetchData();
+
+        // Set up an interval to fetch data every, for example, 5 seconds (adjust as needed)
+        
+      }, [documentId]);
 
       
     return (
@@ -131,8 +193,12 @@ function Home() {
             </div>
             ) : (
                 <div className="text-[#011F43] h-full w-full p-[5vw] glass-effect rounded-lg">
-                <h1 className="text-center text-6xl font-bold">Backend Data</h1>
-                
+     <h2 className="text-2xl font-bold mt-4">Summaries:</h2>
+            <ul>
+                {data && data.summaries.map((summary, index) => (
+                    <li key={index}>{summary}</li>
+                ))}
+            </ul>
                 
             </div>
             )}

@@ -120,7 +120,7 @@ class summalizedoc(APIView):
            list: The summaries of the text.
        """
        summaries = []
-       openai_client = OpenAI(api_key="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")
+       openai_client = OpenAI(api_key="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")
 
        for chunk in self.split_text(text, chunk_size):
            GPT_MODEL = "gpt-3.5-turbo-1106"
