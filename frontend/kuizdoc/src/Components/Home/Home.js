@@ -3,9 +3,9 @@ import SideBar from "../SideBar/SideBar";
 import {useNavigate} from 'react-router-dom';
 
 function Home() {
-    const [open, setOpen] = useState(false);
+    // const [open, setOpen] = useState(false);
     const [chatHistory, setChatHistory] = useState([]);
-    const [isNewChat, setisNewChat] = useState(false)
+    const [isNewChat, setisNewChat] = useState(true)
     const navigate = useNavigate();
     const [data, setData] = useState(null);
     const [documentId, setDocumentId] = useState(null);
@@ -19,6 +19,12 @@ function Home() {
         if (event.key === 'Enter') {
         const input = event.target;
         const message = input.value.trim();
+
+        if (isNewChat) {
+            console.log("Error: Upload a document to continue.");
+            alert("Please upload a document before sending messages.");
+            return; // Exit the function early if it's a new chat
+        }
 
         if (message !== '') {
             setChatHistory([ ...chatHistory, message]);
