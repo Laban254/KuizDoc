@@ -1,5 +1,10 @@
 from django.http import HttpResponse
+from django.contrib.auth.models import User as UserAuth
+from django.contrib.auth import authenticate, login, logout
+from django.shortcuts import render, redirect
+from django.views import View
 from .models import Documents
+from django.contrib import messages
 from .serializers import DocumentsSerializer
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import viewsets, status
@@ -8,7 +13,7 @@ from rest_framework.views import APIView
 import openai
 from openai import OpenAI
 import os
-import fitz
+#import fitz
 import nltk
 nltk.download('punkt')
 from nltk.tokenize import sent_tokenize
@@ -194,3 +199,64 @@ class summalizedoc(APIView):
               context += page_text
       print(f"The pdf Context is {context}")
       return context
+
+
+class UserSignupView(View):
+    template_name = "signup.html"
+
+    def get(self, request):
+        if request.user.is_authenticated:
+            return redirect(f"/user/{request.user.username}")
+        return render(request, self.template_name)
+
+    def post(self, request):
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        email = request.POST.get('email')     
+        password = request.POST.get('password')
+
+        if email in ['login', 'signup', 'home', 'logout']:
+            return render(request, self.template_name, {'error_message': 'Invalid email'})
+
+        if UserAuth.objects.filter(email=email).exists():
+            return render(request, self.template_name, {'error_message': 'User email taken'})
+
+        new_user = UserAuth.objects.create_user(
+            username=email,  # Set to an empty string or any default value
+            email=email,
+            password=password,
+            first_name=first_name,
+            last_name=last_name,
+        )
+        new_user.save()
+        return redirect("login")
+
+
+
+class UserLoginView(View):
+    template_name = "login.html"
+
+    def get(self, request):
+        if request.user.is_authenticated:
+            return redirect(f"/user/{request.user.email}")
+        return render(request, self.template_name)
+
+    def post(self, request):
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        user = authenticate(username=email, password=password)
+
+        if user:
+            login(request, user)
+            first_name = user.first_name
+            print(f"Welcome to Kuizdoc!{first_name}")
+            return redirect("upload/")
+        else:
+            return render(request, self.template_name, {'error_message': 'Wrong email or password. Try again'})
+
+class UserLogoutView(View):
+
+    def get(self, request):
+        logout(request)
+        return redirect('/')

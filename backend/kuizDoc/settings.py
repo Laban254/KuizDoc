@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'Kuizdoc_app',
     'rest_framework',
 ]
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
