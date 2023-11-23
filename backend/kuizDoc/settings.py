@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
 ]
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

@@ -199,3 +199,5 @@ cython_debug/
 
 # ignore local deployment tarballs
 .deployments/
+requirements.txt
+migrations/
