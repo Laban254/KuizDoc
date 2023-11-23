@@ -1,5 +1,16 @@
 from django.db import models
-from django.contrib.auth.models import User as UserAuth
+from django.contrib.auth.models import User
+
+class User(models.Model):
+    first_name = models.CharField(max_length=200)
+    last_name = models.CharField(max_length=200)
+    email = models.CharField(max_length=200)
+    Password = models.CharField(max_length=200)
+
+    class Meta:
+        managed = True
+        db_table = 'User'
+        verbose_name_plural = "User"
 
 class Documents(models.Model):
     Documentid = models.AutoField(primary_key=True)
@@ -32,7 +43,7 @@ class QuizQuestions(models.Model):
 
 class UserAnswers(models.Model):
     Answerid = models.AutoField(primary_key=True)
-    User = models.ForeignKey(UserAuth, on_delete=models.CASCADE)
+    User = models.ForeignKey(User, on_delete=models.CASCADE)
     Question = models.ForeignKey(QuizQuestions, on_delete=models.CASCADE)
     UserAnswer = models.CharField(max_length=1)  # Assuming user's answer is a single character (A, B, C, or D)
     DateCreated = models.DateTimeField(auto_now_add=True)
@@ -44,7 +55,7 @@ class UserAnswers(models.Model):
 
 class UserScores(models.Model):
     Scoreid = models.AutoField(primary_key=True)
-    User = models.ForeignKey(UserAuth, on_delete=models.CASCADE)
+    User = models.ForeignKey(User, on_delete=models.CASCADE)
     Quiz = models.ForeignKey(QuizQuestions, on_delete=models.CASCADE)
     Score = models.IntegerField()
     DateCreated = models.DateTimeField(auto_now_add=True)

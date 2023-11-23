@@ -1,5 +1,7 @@
 from rest_framework import serializers
-from .models import Documents, QuizQuestions, UserAnswers, UserScores
+from .models import Documents, QuizQuestions, UserAnswers, UserScores, User 
+from django.contrib.auth.models import User
+
 
 class DocumentsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -23,3 +25,11 @@ class UserScoresSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserScores
         fields = '__all__'
+
+class UserSerializer(serializers.Serializer):
+    model = User
+    fields = ['first_name', 'last_name', 'email', 'Password']
+
+    def create(self, validated_data):
+        user = User.objects.create_user(**validated_data)
+        return user
