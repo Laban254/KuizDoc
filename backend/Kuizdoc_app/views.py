@@ -3,9 +3,9 @@ from django.contrib.auth.models import User as UserAuth
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
 from django.views import View
-from .models import Documents
+from .models import Documents, QuizQuestions, UserAnswers
 from django.contrib import messages
-from .serializers import DocumentsSerializer
+from .serializers import DocumentsSerializer, UserSerializer
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import viewsets, status
 from rest_framework.response import Response
@@ -13,7 +13,9 @@ from rest_framework.views import APIView
 import openai
 from openai import OpenAI
 import os
-#import fitz
+import random
+from corsheaders.middleware import CorsMiddleware
+import fitz
 import nltk
 nltk.download('punkt')
 from nltk.tokenize import sent_tokenize
@@ -77,7 +79,7 @@ class summalizedoc(APIView):
        except Documents.DoesNotExist:
            return Response({"error": "No document found"}, status=404)
 
-       summaries = self.summarize_text(cleaned_text)
+       summaries = self.summarize_text(cleaned_text, question=False, generate=False)
        return Response({"summaries": summaries})
 
    def clean_text(self, text):
@@ -108,7 +110,7 @@ class summalizedoc(APIView):
        cleaned_text = cleaned_text.replace('\x18', ' ')
        return cleaned_text
 
-   def summarize_text(self, text, chunk_size=5000):
+   def summarize_text(self, text, question, generate, chunk_size=5000):
        """
        Summarizes the text using the OpenAI GPT-3.5-turbo-1106 model.
 
@@ -120,14 +122,27 @@ class summalizedoc(APIView):
            list: The summaries of the text.
        """
        summaries = []
-       openai_client = OpenAI(api_key="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")
+       openai_client = OpenAI(api_key="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")
 
        for chunk in self.split_text(text, chunk_size):
            GPT_MODEL = "gpt-3.5-turbo-1106"
-           messages = [
-               {"role": "system", "content": "You are a helpful assistant."},
-               {"role": "user", "content": f"{chunk}\n\nSummarize:"},
-           ]
+           if question:
+               messages = [
+                   {"role": "system", "content": "You are a helpful assistant."},
+                   {"role": "user", "content": f"{chunk}\n\nSummarize:"},
+                   {"role": "user", "content": f"{question}"},
+               ]
+           elif generate:
+                messages = [
+                     {"role": "system", "content": "You are a helpful assistant."},
+                     {"role": "user", "content": f"{chunk}\n\nSummarize:"},
+                     {"role": "user", "content": f"Generate {generate} sample questions:"},
+                ]
+           else:    
+                messages = [
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "user", "content": f"{chunk}\n\nSummarize:"},
+                ]
 
            response = openai_client.chat.completions.create(
                model=GPT_MODEL,
@@ -199,39 +214,114 @@ class summalizedoc(APIView):
               context += page_text
       print(f"The pdf Context is {context}")
       return context
+      
+class GenerateQuiz(summalizedoc):
 
 
-class UserSignupView(View):
-    template_name = "signup.html"
-
-    def get(self, request):
-        if request.user.is_authenticated:
-            return redirect(f"/user/{request.user.username}")
-        return render(request, self.template_name)
-
-    def post(self, request):
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
-        email = request.POST.get('email')     
-        password = request.POST.get('password')
-
-        if email in ['login', 'signup', 'home', 'logout']:
-            return render(request, self.template_name, {'error_message': 'Invalid email'})
-
-        if UserAuth.objects.filter(email=email).exists():
-            return render(request, self.template_name, {'error_message': 'User email taken'})
-
-        new_user = UserAuth.objects.create_user(
-            username=email,  # Set to an empty string or any default value
-            email=email,
-            password=password,
-            first_name=first_name,
-            last_name=last_name,
-        )
-        new_user.save()
-        return redirect("login")
+    def post(self, request, *args, **kwargs):
+        """
+        return HttpResponse('This is a POST request')
+        """
+        id = kwargs.get('id')
+        try:
+              document = Documents.objects.get(Documentid=id)
+              document_content = self.read_pdf(document.file)
+              cleaned_text = self.clean_text(document_content)
+        except Documents.DoesNotExist:
+              return Response({"error": "No document found"}, status=404)
+        questions = self.summarize_text(cleaned_text, generate=5, question=False)
+        return Response({"questions": questions})
 
 
+    # def generate_questions(self, text, num_questions=5):
+    #     """
+    #     Generates questions from the text using the OpenAI GPT-3.5-turbo-1106 model.
+
+    #     Args:
+    #         text (str): The text to generate questions from.
+    #         num_questions (int): The number of questions to generate.
+
+    #     Returns:
+    #         list: The generated questions.
+    #     """
+    #     questions = []
+
+    #     # Replace "your_openai_api_key" with your actual OpenAI API key
+    #     openai_client = OpenAI(api_key="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")
+
+    #     GPT_MODEL = "gpt-3.5-turbo-1106"
+        
+    #     # Prepare messages for the OpenAI GPT-3.5-turbo model
+    #     messages = [
+    #         {"role": "system", "content": "You are a helpful assistant."},
+    #         {"role": "user", "content": f"{text}\n\nGenerate {num_questions} questions:"},
+    #     ]
+
+    #     # Request question generation from OpenAI GPT-3.5-turbo
+    #     response = openai_client.chat.completions.create(
+    #         model=GPT_MODEL,
+    #         messages=messages,
+    #         temperature=0,
+    #         max_tokens=100,
+    #         stop=["\n\n"]
+    #     )
+
+    #     # Extract and split the generated questions
+    #     generated_questions = response.choices[0].message.content.strip().split("\n")
+
+    #     # Define a basic question structure
+    #     question_template = {
+    #         "QuestionText": "",
+    #         "OptionA": "Option A",
+    #         "OptionB": "Option B",
+    #         "OptionC": "Option C",
+    #         "OptionD": "Option D",
+    #         "Answer": "Answer"
+    #     }
+
+    #     # Iterate over the generated questions
+    #     for generated_question in generated_questions:
+    #         # Update the question text in the template
+    #         question_template["QuestionText"] = generated_question.strip()
+            
+    #         # Add the modified question to the list of questions
+    #         questions.append(question_template.copy())
+
+    #     return questions
+class AnswerQuiz(summalizedoc):
+
+
+    def post(self, request, *args, **kwargs):
+        """
+        return HttpResponse('This is a POST request')
+        """
+        question = kwargs.get('question')
+        id = kwargs.get('id')
+        try:
+              document = Documents.objects.get(Documentid=id)
+              document_content = self.read_pdf(document.file)
+              cleaned_text = self.clean_text(document_content)
+        except Documents.DoesNotExist:
+              return Response({"error": "No document found"}, status=404)
+        answer = self.summarize_text(cleaned_text, generate=False, question=question)
+        return Response({"answer": answer})
+
+class UserSignupView(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = UserSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            # Create a new user based on the serializer data
+            # user = .objects.create_user(
+            #     username=serializer.validated_data['username'],
+            #     email=serializer.validated_data['email'],
+            #     password=serializer.validated_data['password']
+            # )
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UserLoginView(View):
     template_name = "login.html"
@@ -246,6 +336,13 @@ class UserLoginView(View):
         password = request.POST.get('password')
 
         user = authenticate(username=email, password=password)
+
+        file_serializer = UserLoginSerializer(data=request.data)
+        if file_serializer.is_valid():
+            file_serializer.save()
+            return Response(file_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         if user:
             login(request, user)
