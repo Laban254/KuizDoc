@@ -5,7 +5,7 @@ function SideBar({chatHistory}) {
   return (
     <div class="container ">
         <div class="box ">
-            {/* <span class="title text-[#011F43] text-center">History</span> */}
+            <span class="title text-[#011F43] text-center">History</span> 
             <div>
             <ol id="chatHistory" className="list-decimal p-0 ml-10">
             {chatHistory.slice(0).reverse().map((message, index) => (
