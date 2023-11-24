@@ -236,7 +236,7 @@ function Home() {
                 <div className="text-[#011F43]  w-full p-[5vw] glass-effect rounded-lg">
                      <h2 className="text-2xl font-bold mt-4">Questions:</h2>
                             <ul>
-                                {question && question.map((summary, index) => (
+                                {question && question.1.map((summary, index) => (
                                     <li key={index}>{summary}</li>
                                 ))}
                             </ul>
