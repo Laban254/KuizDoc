@@ -10,6 +10,7 @@ function Home() {
     const [data, setData] = useState(null);
     const [documentId, setDocumentId] = useState(null);
     const [question, setQuestions] = useState([]);
+    const [quiz, setQuiz] = useState([]);
 
     // const toggleDrawer = () => {
     //     setOpen(!open);
@@ -30,6 +31,24 @@ function Home() {
         if (message !== '') {
             setChatHistory([ ...chatHistory, message]);
             input.value = '';
+        }
+            try {
+        const response = await fetch('http://127.0.0.1:8000/question/1/', {
+            method: 'GET', // Assuming you want to retrieve data using GET
+            headers: {
+            'Content-Type': 'application/json',
+            // Add any other headers as needed
+            },
+        });
+    
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+    
+        const result = await response.json();
+        setQuiz(result.summaries); // Update state with questions
+        } catch (error) {
+        console.error('Error fetching data from the backend:', error.message);
         }
         }
     };
@@ -224,7 +243,7 @@ function Home() {
             ) : (
                 <>
                 <div className="text-[#011F43]  w-full p-[vw] glass-effect rounded-lg">
-                     <h2 className="text-2xl font-bold mt-4">Summaries:</h2>
+                     <h2 className="text-2xl font-bold mt-1">Summaries:</h2>
                             <ul>
                                 {data && data.summaries.map((summary, index) => (
                                     <li key={index}>{summary}</li>
@@ -234,9 +253,20 @@ function Home() {
                             </div>
                  
                 <div className="text-[#011F43]  w-full p-[5vw] glass-effect rounded-lg">
-                     <h2 className="text-2xl font-bold mt-4">Questions:</h2>
+                     <h2 className="text-2xl font-bold mt-1">Questions:</h2>
                             <ul>
                                 {question && question.1.map((summary, index) => (
+                                    <li key={index}>{summary}</li>
+                                ))}
+                            </ul>
+                 
+                            </div>
+                </>
+
+                <div className="text-[#011F43]  w-full p-[5vw] glass-effect rounded-lg">
+                     <h2 className="text-2xl font-bold mt-1">Answers:</h2>
+                            <ul>
+                                {quiz && quiz.1.map((summary, index) => (
                                     <li key={index}>{summary}</li>
                                 ))}
                             </ul>
