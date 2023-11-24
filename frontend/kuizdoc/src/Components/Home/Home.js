@@ -167,7 +167,7 @@ function Home() {
                     {/*history button*/}
                    <div className="flex items-start">
                     <button
-                    title="History"
+                    title="New Chat"
                     className="group ml-2 mt-2 cursor-pointer outline-none hover:rotate-90 duration-300"
                     onClick={() => setisNewChat(true)}
                     >
