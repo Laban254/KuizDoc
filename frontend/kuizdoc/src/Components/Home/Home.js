@@ -9,6 +9,7 @@ function Home() {
     const navigate = useNavigate();
     const [data, setData] = useState(null);
     const [documentId, setDocumentId] = useState(null);
+    const [question, setQuestions] = useState([]);
 
     // const toggleDrawer = () => {
     //     setOpen(!open);
@@ -110,6 +111,28 @@ function Home() {
         
       }, [documentId]);
 
+      const handleGenerateQuiz = async () => {
+        try {
+        const response = await fetch('http://127.0.0.1:8000/GenerateQuiz/1/', {
+            method: 'GET', // Assuming you want to retrieve data using GET
+            headers: {
+            'Content-Type': 'application/json',
+            // Add any other headers as needed
+            },
+        });
+    
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+    
+        const result = await response.json();
+        setQuestions(result.questions); // Update state with questions
+        } catch (error) {
+        console.error('Error fetching data from the backend:', error.message);
+        }
+    }
+
+
       
     return (
         <>
@@ -197,16 +220,31 @@ function Home() {
                 <p className="absolute bottom-4">Did you know you ask me anything from the document you have to upload?</p>
 
             </div>
+
             ) : (
-                <div className="text-[#011F43] h-full w-full p-[5vw] glass-effect rounded-lg">
-     <h2 className="text-2xl font-bold mt-4">Summaries:</h2>
-            <ul>
-                {data && data.summaries.map((summary, index) => (
-                    <li key={index}>{summary}</li>
-                ))}
-            </ul>
-                
-            </div>
+                <>
+                <div className="text-[#011F43]  w-full p-[vw] glass-effect rounded-lg">
+                     <h2 className="text-2xl font-bold mt-4">Summaries:</h2>
+                            <ul>
+                                {data && data.summaries.map((summary, index) => (
+                                    <li key={index}>{summary}</li>
+                                ))}
+                            </ul>
+                 
+                            </div>
+                 
+                <div className="text-[#011F43]  w-full p-[5vw] glass-effect rounded-lg">
+                     <h2 className="text-2xl font-bold mt-4">Questions:</h2>
+                            <ul>
+                                {question && question.map((summary, index) => (
+                                    <li key={index}>{summary}</li>
+                                ))}
+                            </ul>
+                 
+                            </div>
+                </>
+
+        
             )}
             {/* <input
                 type="text"
@@ -217,7 +255,32 @@ function Home() {
      <button onClick={sendMessage} className="ml-2 px-4 py-2 bg-blue-500 text-white">
     Send
   </button> */}
-            <div className="flex">
+  <br/>
+  <br/>
+             <button className="summarize rounded-full float-right mb-5" onClick={handleGenerateQuiz}>
+            <div className="svg-wrapper-1">
+                <div className="svg-wrapper">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    width="14"
+                    height="14"
+                >
+                    <path fill="none" d="M0 0h24v24H0z"></path>
+                    <path
+                    fill="currentColor"
+                    d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"
+                    ></path>
+                </svg>
+                </div>
+            </div>
+
+            <span>Generate</span>
+            </button>
+
+            <br/>
+            <div className="flex mt-10">
+
             <input
                 type="text"
                 placeholder="Type a message..."
@@ -227,6 +290,9 @@ function Home() {
             {/* <button onClick={sendMessage} className=" ">
                 Send
             </button> */}
+           
+            
+           
             <button className="button rounded-r-full" onClick={sendMessage}>
             <div className="svg-wrapper-1">
                 <div className="svg-wrapper">
