@@ -3,9 +3,10 @@ from django.contrib.auth.models import User as UserAuth
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
 from django.views import View
-from .models import Documents, QuizQuestions, UserAnswers
+from .models import Documents, QuizQuestions, UserAnswers, kuizDocUser
+
 from django.contrib import messages
-from .serializers import DocumentsSerializer, UserSerializer
+from .serializers import DocumentsSerializer, UserSerializer, kuizDocUserSerializer, MyTokenObtainPairSerializer
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import viewsets, status
 from rest_framework.response import Response
@@ -20,6 +21,73 @@ import nltk
 nltk.download('punkt')
 from nltk.tokenize import sent_tokenize
 from io import StringIO
+
+# test
+import logging
+from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework.permissions import AllowAny
+from rest_framework import generics
+from .models import CustomUser
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework import serializers
+from django.contrib.auth.password_validation import validate_password
+
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    """
+    Custom token view for obtaining JWT tokens.
+
+    Extends the TokenObtainPairView from rest_framework_simplejwt.
+    This view includes the access and refresh tokens in the response.
+
+    Attributes:
+        serializer_class: The serializer class to use for token generation.
+
+    Methods:
+        post(request, *args, **kwargs): Handles the POST request to obtain tokens and customize the response.
+    """
+    serializer_class = MyTokenObtainPairSerializer
+
+    def post(self, request, *args, **kwargs):
+        """
+        Handle the POST request to obtain JWT tokens and customize the response.
+
+        Args:
+            request: The HTTP request object.
+            *args: Additional positional arguments.
+            **kwargs: Additional keyword arguments.
+
+        Returns:
+            Response: JSON response containing access and refresh tokens.
+        """
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.user
+        refresh_token = serializer.validated_data["refresh"]
+        access_token = serializer.validated_data["access"]
+        response = {
+            "access": str(access_token),
+            "refresh": str(refresh_token),
+        }
+        return Response(response)
+
+
+
+
+
+class KuizDocUserView(APIView):
+    serializer_class = kuizDocUserSerializer  # Specify the serializer class directly
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response({"user_id": user.id, "message": "User created successfully"}, 
+                            status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# 
 
 class uploadDoc(viewsets.ModelViewSet):
    """
