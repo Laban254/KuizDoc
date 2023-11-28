@@ -1,20 +1,10 @@
 from rest_framework import serializers
-from .models import Documents, QuizQuestions, UserAnswers, UserScores, User, kuizDocUser 
-from django.contrib.auth.models import User
-
-# test
-
+from .models import Documents, QuizQuestions, UserAnswers, UserScores, kuizDocUser
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
-
-
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     """
@@ -44,7 +34,7 @@ class kuizDocUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = kuizDocUser
-        fields = ('first_name', 'first_name', 'email', 'password', 'confirm_password', 'age', 'gender')
+        fields = ('first_name', 'last_name', 'email', 'password', 'confirm_password', 'age', 'gender')
 
     def create(self, validated_data):
         """
@@ -57,42 +47,64 @@ class kuizDocUserSerializer(serializers.ModelSerializer):
             The created Non-Litigant instance.
         """
         non_litigant = kuizDocUser.objects.create(
-            
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name'],
             email=validated_data['email'],
+            age=validated_data['age'],
+            gender=validated_data['gender']
         )
         non_litigant.set_password(validated_data['password'])
         non_litigant.save()
         return non_litigant
 
-
-
 class DocumentsSerializer(serializers.ModelSerializer):
+    """
+    Serializer for Documents model.
+    """
     class Meta:
         model = Documents
         fields = '__all__'
 
-
 class QuizQuestionsSerializer(serializers.ModelSerializer):
+    """
+    Serializer for QuizQuestions model.
+    """
     class Meta:
         model = QuizQuestions
         fields = '__all__'
 
-
 class UserAnswersSerializer(serializers.ModelSerializer):
+    """
+    Serializer for UserAnswers model.
+    """
     class Meta:
         model = UserAnswers
         fields = '__all__'
 
-
 class UserScoresSerializer(serializers.ModelSerializer):
+    """
+    Serializer for UserScores model.
+    """
     class Meta:
         model = UserScores
         fields = '__all__'
 
 class UserSerializer(serializers.Serializer):
+    """
+    Serializer for User model.
+    """
     model = User
-    fields = ['first_name', 'last_name', 'email', 'Password']
+    fields = ['first_name', 'last_name', 'email', 'password']
 
     def create(self, validated_data):
+        """
+        Create and save a new User instance with validated data.
+
+        Args:
+            validated_data: Validated data for creating a new User.
+
+        Returns:
+            The created User instance.
+        """
         user = User.objects.create_user(**validated_data)
         return user

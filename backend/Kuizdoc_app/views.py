@@ -301,61 +301,8 @@ class GenerateQuiz(summalizedoc):
         return Response({"questions": questions})
 
 
-    # def generate_questions(self, text, num_questions=5):
-    #     """
-    #     Generates questions from the text using the OpenAI GPT-3.5-turbo-1106 model.
+    
 
-    #     Args:
-    #         text (str): The text to generate questions from.
-    #         num_questions (int): The number of questions to generate.
-
-    #     Returns:
-    #         list: The generated questions.
-    #     """
-    #     questions = []
-
-    #     # Replace "your_openai_api_key" with your actual OpenAI API key
-    #     openai_client = OpenAI(api_key="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")
-
-    #     GPT_MODEL = "gpt-3.5-turbo-1106"
-        
-    #     # Prepare messages for the OpenAI GPT-3.5-turbo model
-    #     messages = [
-    #         {"role": "system", "content": "You are a helpful assistant."},
-    #         {"role": "user", "content": f"{text}\n\nGenerate {num_questions} questions:"},
-    #     ]
-
-    #     # Request question generation from OpenAI GPT-3.5-turbo
-    #     response = openai_client.chat.completions.create(
-    #         model=GPT_MODEL,
-    #         messages=messages,
-    #         temperature=0,
-    #         max_tokens=100,
-    #         stop=["\n\n"]
-    #     )
-
-    #     # Extract and split the generated questions
-    #     generated_questions = response.choices[0].message.content.strip().split("\n")
-
-    #     # Define a basic question structure
-    #     question_template = {
-    #         "QuestionText": "",
-    #         "OptionA": "Option A",
-    #         "OptionB": "Option B",
-    #         "OptionC": "Option C",
-    #         "OptionD": "Option D",
-    #         "Answer": "Answer"
-    #     }
-
-    #     # Iterate over the generated questions
-    #     for generated_question in generated_questions:
-    #         # Update the question text in the template
-    #         question_template["QuestionText"] = generated_question.strip()
-            
-    #         # Add the modified question to the list of questions
-    #         questions.append(question_template.copy())
-
-    #     return questions
 class AnswerQuiz(summalizedoc):
 
 
@@ -380,13 +327,6 @@ class UserSignupView(APIView):
 
         if serializer.is_valid():
             serializer.save()
-            # Create a new user based on the serializer data
-            # user = .objects.create_user(
-            #     username=serializer.validated_data['username'],
-            #     email=serializer.validated_data['email'],
-            #     password=serializer.validated_data['password']
-            # )
-
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
