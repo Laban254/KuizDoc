@@ -17,7 +17,7 @@ function Home() {
     // };
 
 
-    const sendMessage = (event) => {
+    const sendMessage = async (event) => {
         if (event.key === 'Enter') {
         const input = event.target;
         const message = input.value.trim();
@@ -255,18 +255,18 @@ function Home() {
                 <div className="text-[#011F43]  w-full p-[5vw] glass-effect rounded-lg">
                      <h2 className="text-2xl font-bold mt-1">Questions:</h2>
                             <ul>
-                                {question && question.1.map((summary, index) => (
+                                {question && question.length >= 2 && question[1].map((summary, index) => (
                                     <li key={index}>{summary}</li>
                                 ))}
                             </ul>
                  
                             </div>
-                </>
+                
 
                 <div className="text-[#011F43]  w-full p-[5vw] glass-effect rounded-lg">
                      <h2 className="text-2xl font-bold mt-1">Answers:</h2>
                             <ul>
-                                {quiz && quiz.1.map((summary, index) => (
+                                {quiz && quiz.length >= 2 && quiz[1].map((summary, index) => (
                                     <li key={index}>{summary}</li>
                                 ))}
                             </ul>
